@@ -1,0 +1,7 @@
+*__pycache__*
+*venv*
+ponds.egg*
+build/
+.coverage
+.pytest_cache
+*dummy.nc
