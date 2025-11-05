@@ -1,0 +1,54 @@
+# toml-file started June 2025 by Lukas Röhrich
+#
+# This file acts as a configuration file for the ponds packages
+# by Potsdam Institute for Climate Impact Research, GER
+#
+# Tutorial on how to setup this config file:
+# https://packaging.python.org/en/latest/guides/writing-pyproject-toml/
+
+# choose build-backend
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = [
+    "setuptools",
+    ]
+
+# basic metadata
+[project]
+name = "ponds"
+version = "0.1"
+description = "Perturbed Observables in Nonlinear Dynamics Synthesiser"
+readme = "README.md"
+keywords = ["tipping", "tipping points", "climate", "generator", "climate data"]
+authors = [
+    {name = "Sina Loriani", email = "sina.loriani@pik-potsdam.de"}
+]
+maintainers = [
+    {name = "Lukas Röhrich", email = "lukas.roehrich@pik-potsdam.de"}
+]
+classifiers = [
+    "Topic :: Scientific :: Climate",
+    "Intended Audience :: Climate Scientists",
+    "Programming Language :: Python",
+]
+
+dependencies = [
+        "numpy<=2.1.0",
+        "scipy",
+        "xarray",
+        "matplotlib",
+        "netCDF4",
+        "cartopy",
+        "scipy",
+]
+
+[project.optional-dependencies]
+# developer mode: install with `pip install .[dev]`
+dev = [
+    "pytest",
+    "pytest-cov",
+]
+
+
+[tool.setuptools]
+packages = {find = {}}
