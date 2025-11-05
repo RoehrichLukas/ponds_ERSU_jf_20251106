@@ -5,6 +5,7 @@ import numpy as np
 from matplotlib.colors import ListedColormap
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
+from matplotlib import cm
 
 from typing import Any
 from numpy.typing import NDArray
@@ -165,12 +166,14 @@ def worldmap(
             if verbose:
                 print(f"Shift type for mask {i + 1}: {shift_type}")
 
+            # Adjust position for CELL shapes, otherwise it the label would occlude the cluster
             if shape_type == "CELL":
                 pos_lon = center_lon
                 pos_lat = center_lat + 5
             else:
                 pos_lon = center_lon
                 pos_lat = center_lat
+
             # Add text label at the center with a non-transparent box
             ax.text(  # type: ignore
                 pos_lon,  # type: ignore
@@ -184,7 +187,7 @@ def worldmap(
                 bbox=dict(
                     facecolor=cblobs[i % len(cblobs)],
                     edgecolor="none",
-                    alpha=1.0,
+                    alpha=0.7,
                     boxstyle="round,pad=0.3",
                 ),
             )
@@ -241,5 +244,108 @@ def plot_all_ts(
     ax.set_title(title)  # type: ignore
     ax.set_xlabel("Time")  # type: ignore
     ax.set_ylabel("Value")  # type: ignore
+
+    return fig, ax
+
+
+def barplot_3D(
+    mask,
+    xarray,
+    yarray,
+    time_values,
+    alpha=1.0,
+    cmap="viridis",
+    linewidth=0.3,
+    elev=40,
+    azim=120,
+):
+    """
+    Create an interactive 3D bar plot of values on a masked grid.
+    Bars are colored based on their height using a colormap.
+    """
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection="3d")
+
+    # Create grid
+    x, y = np.meshgrid(xarray, yarray)
+    z_base = time_values[mask].min() - 0.5
+    z = np.full_like(time_values, z_base)
+    dx = np.abs(xarray[1] - xarray[0])
+    dy = np.abs(yarray[1] - yarray[0])
+    dz = time_values[mask] - z_base
+
+    # Normalize values to [0,1] for colormap
+    norm = plt.Normalize(time_values[mask].min(), time_values[mask].max())
+    colors = plt.colormaps[cmap](norm(time_values[mask]))  # updated line
+
+    # Plot bars with color-mapped heights
+    ax.bar3d(
+        x[mask],
+        y[mask],
+        z[mask],
+        dx,
+        dy,
+        dz,  # time_values[mask],
+        zsort="max",
+        alpha=alpha,
+        color=colors,
+        edgecolor="black",
+        linewidth=linewidth,
+    )
+
+    # eye candy
+    ax.view_init(elev=elev, azim=azim)
+    ax.grid(True)
+    ax.set_zlim(z_base, time_values[mask].max() + 0.1)
+    ax.set_xlabel("Longitude [°]")
+    ax.set_ylabel("Latitude [°]")
+    ax.set_zlabel("Shift Time Offset [time steps]")
+    if np.abs(elev) >= 80:
+        ax.set_zticks([])
+        ax.set_zticklabels([])
+        ax.set_zlabel("")
+
+    # Add a colorbar
+    mappable = cm.ScalarMappable(cmap=plt.colormaps[cmap], norm=norm)
+    mappable.set_array([])
+    cbar = fig.colorbar(
+        mappable,
+        ax=ax,
+        shrink=0.5,
+        aspect=10,
+        pad=0.1,
+        label="Shift Time Offset [time steps]",
+    )
+    # Set colorbar ticks to integers only
+    cbar.set_ticks(
+        np.arange(int(time_values[mask].min()), int(time_values[mask].max()) + 1, 2)
+    )
+    cbar.ax.set_yticklabels([str(int(t)) for t in cbar.get_ticks()])
+
+    # Add an inset axes for a head-up view
+    inset_ax = fig.add_axes([0.65, 0.65, 0.3, 0.3], projection="3d")
+    inset_ax.set_position([0.05, 0.65, 0.3, 0.3])
+    inset_ax.set_facecolor((0, 0, 0, 0))
+
+    inset_ax.bar3d(
+        x[mask],
+        y[mask],
+        z[mask],
+        dx,
+        dy,
+        dz,
+        zsort="max",
+        alpha=alpha,
+        color=colors,
+        edgecolor="black",
+        linewidth=linewidth,
+    )
+
+    # Set a custom view angle for the inset
+    inset_ax.view_init(elev=-90, azim=-90)
+    inset_ax.set_xticks([])
+    inset_ax.set_yticks([])
+    inset_ax.set_title("Bird View", fontsize=8)
 
     return fig, ax
