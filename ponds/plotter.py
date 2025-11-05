@@ -161,13 +161,20 @@ def worldmap(
             center_lat = mask.attrs["center_lat"]  # type: ignore
             center_lon = mask.attrs["center_lon"]  # type: ignore
             shift_type = str(mask.attrs["shift_type"]).split(".")[-1][:-2]  # type: ignore
+            shape_type = str(mask.attrs["shape_type"]).split(".")[-1][:-2]  # type: ignore
             if verbose:
                 print(f"Shift type for mask {i + 1}: {shift_type}")
 
+            if shape_type == "CELL":
+                pos_lon = center_lon
+                pos_lat = center_lat + 5
+            else:
+                pos_lon = center_lon
+                pos_lat = center_lat
             # Add text label at the center with a non-transparent box
             ax.text(  # type: ignore
-                center_lon,  # type: ignore
-                center_lat,  # type: ignore
+                pos_lon,  # type: ignore
+                pos_lat,  # type: ignore
                 f"{shift_type}",
                 fontsize=10,
                 color="black",
