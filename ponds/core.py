@@ -729,3 +729,65 @@ class PONDS:
         )
 
         return fig, ax
+    
+    def plot_some_ts(
+        self,
+        ratio: float = 0.1,
+        alpha: float = 0.5,
+        linewidth: float = 0.5,
+        figsize: tuple[float, float] = (16, 4),
+        title: str = "Time Series for Some Example Cells",
+    ) -> tuple[Figure, Axes]:
+        """
+        Plots the time series of selected grid cells from the PONDS dataset.
+
+        Args:
+            lat_indices (list[int]): List of latitude indices to plot.
+            lon_indices (list[int]): List of longitude indices to plot.
+            linewidth (float): Line width for the plots.
+            alpha (float): Transparency for the plots.
+            figsize (tuple): Size of the figure.
+            title (str): Title of the plot.
+        """
+
+        fig, ax = plotter.plot_some_ts(
+            ponds=self,
+            ratio=ratio,
+            alpha=alpha,
+            linewidth=linewidth,
+            figsize=figsize,
+            title=title,
+        )
+
+        return fig, ax
+    
+    def plot_single_ts(
+            self,
+            lat: float,
+            lon: float,alpha: float = 0.5,
+            linewidth: float = 0.5,
+            figsize: tuple[float, float] = (16, 4),
+            title: str = "Time Series for Single Cell",
+        ) -> tuple[Figure, Axes]:
+        """
+        Plots the time series of a single grid cell from the PONDS dataset.
+
+        Args:
+            lat (float): Latitude of the grid cell to plot.
+            lon (float): Longitude of the grid cell to plot.
+            linewidth (float): Line width for the plot.
+            alpha (float): Transparency for the plot.
+            figsize (tuple): Size of the figure.
+            title (str): Title of the plot.
+        """
+        fig, ax = plotter.plot_single_ts(
+            ponds=self,
+            lat=lat,
+            lon=lon,
+            alpha=alpha,
+            linewidth=linewidth,
+            figsize=figsize,
+            title=title,
+        )
+
+        return fig, ax

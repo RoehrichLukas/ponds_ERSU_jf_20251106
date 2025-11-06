@@ -247,6 +247,81 @@ def plot_all_ts(
 
     return fig, ax
 
+def plot_some_ts(
+    ponds: Any,
+    ratio: float = 0.1,
+    alpha: float = 0.5,
+    linewidth: float = 0.5,
+    figsize: tuple[float, float] = (16, 4),
+    title: str = "Time Series for Some Example Cells",
+) -> tuple[Figure, Axes]:
+    """
+    Plots time series of some exemplary grid cell from the PONDS dataset.
+    """
+
+    fig, ax = plt.subplots(  # type: ignore
+        figsize=figsize,
+    )
+
+    for i in range(ponds.data.sizes["lat"]):
+        for j in range(ponds.data.sizes["lon"]):
+            if np.random.rand() > ratio:
+                continue
+            ax.plot(  # type: ignore
+                ponds.data.ts[:, i, j],
+                linestyle="-",
+                linewidth=linewidth,
+                marker=None,
+                color="grey",
+                alpha=alpha,
+            )
+
+    # eyecandy
+    ax.set_title(title)  # type: ignore
+    ax.set_xlabel("Time")  # type: ignore
+    ax.set_ylabel("Value")  # type: ignore
+
+    return fig, ax
+
+def plot_single_ts(
+    ponds: Any,
+    lat: float,
+    lon: float,
+    alpha: float = 0.5,
+    linewidth: float = 0.5,
+    figsize: tuple[float, float] = (16, 4),
+    title: str = "Time Series for Single Cell",
+) -> tuple[Figure, Axes]:
+    """
+    Plots time series of some exemplary grid cell from the PONDS dataset.
+    """
+
+    fig, ax = plt.subplots(  # type: ignore
+        figsize=figsize,
+    )
+
+    # find nearest grid cell
+    latitudes = ponds.data.coords["lat"].values  # type: ignore
+    longitudes = ponds.data.coords["lon"].values  # type: ignore
+    lat_idx = (np.abs(latitudes - lat)).argmin()
+    lon_idx = (np.abs(longitudes - lon)).argmin()
+
+    ax.plot(  # type: ignore
+        ponds.data.ts[:, lat_idx, lon_idx],
+        linestyle="-",
+        linewidth=linewidth,
+        marker=None,
+        color="grey",
+        alpha=alpha,
+    )
+
+    # eyecandy
+    ax.set_title(title+f"\n(Lat: {lat}, Lon: {lon})")  # type: ignore
+    ax.set_xlabel("Time")  # type: ignore
+    ax.set_ylabel("Value")  # type: ignore
+
+    return fig, ax
+
 
 def barplot_3D(
     mask,
